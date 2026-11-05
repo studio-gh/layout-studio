@@ -192,6 +192,9 @@ function svgMarkup(mode='both'){
   if($('safeFill').checked)s+=`<rect x="${x}" y="${y}" width="${safeW}" height="${sh}" fill="#4b9b79" fill-opacity=".08"/>`;
   s+=`<rect x="${x}" y="${y}" width="${safeW}" height="${sh}" fill="none" stroke="#3b8c6b" stroke-width="${Math.max(1,sw)}" stroke-dasharray="7 5"/>`;
   s+=`<g fill="#3b8c6b" font-family="Arial,sans-serif" font-size="${Math.max(10,Math.min(W,H)*.018)}"><text x="${x+6}" y="${y+Math.max(14,Math.min(W,H)*.025)}">SAFE AREA</text></g>`;
+
+ }
+ // Platform UI is independent from the Safe zone layer.
   // Optional platform-interface preview: visual guides for floating controls,
   // captions and bottom navigation, not a claim of exact live UI dimensions.
   if(ui && ['ig-story','tiktok','youtube-shorts'].includes($('platform').value)){
@@ -204,7 +207,6 @@ function svgMarkup(mode='both'){
     const top=H*.035, bottom=H*.91;
     s+=`<g fill="#262626" fill-opacity=".12" stroke="#777777" stroke-opacity=".5" stroke-width="${Math.max(1,sw)}"><rect x="${W*.04}" y="${top}" width="${W*.42}" height="${H*.025}" rx="4"/><rect x="${W*.04}" y="${H*.94}" width="${W*.58}" height="${H*.018}" rx="4"/><rect x="${W*.04}" y="${H*.965}" width="${W*.36}" height="${H*.012}" rx="4"/></g>`;
   }
- }
  return s+'</svg>';
 }
 function render(){
