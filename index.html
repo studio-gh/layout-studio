@@ -151,7 +151,7 @@ function applyComposition(key){const c={editorial:['muller20',4,5,18,64],type:['
 function setPreset(key){if(!presets[key])return;let p=presets[key];['width','height','columns','rows','gutter','margin','safeX','safeY','safeBottom'].forEach((id,i)=>$(id).value=p[i]);$('platform').value=key;customSafe=false;$('safePreset').value=['ig-story','tiktok','youtube-shorts'].includes(key)?'story':key==='carousel'?'carousel':key==='facebook'?'facebook':key.startsWith('linkedin')?'linkedin':'platform';render()}
 function n(id){return Math.max(0,Number($(id).value)||0)}
 function svgMarkup(mode='both'){
- const W=Math.max(100,Math.min(8000,n('width'))),H=Math.max(100,Math.min(8000,n('height'))),cols=Math.max(2,n('columns')),rows=Math.max(2,n('rows')),m=n('margin'),g=n('gutter'),sw=Number($('lineWeight').value),op=n('opacity')/100,color=$('gridColor').value,dash=$('lineStyle').value==='dashed'?'6 5':$('lineStyle').value==='dotted'?'1 4':'';
+ const W=Math.max(100,Math.min(8000,n('width'))),H=Math.max(100,Math.min(8000,n('height'))),cols=Math.max(2,n('columns')),rows=Math.max(2,n('rows')),m=Math.min(n('margin'),Math.min(W,H)/2),g=Math.min(n('gutter'),Math.max(W,H)),sw=Math.max(.25,Math.min(20,Number($('lineWeight').value)||1)),op=Math.min(1,Math.max(0,n('opacity')/100)),color=$('gridColor').value,dash=$('lineStyle').value==='dashed'?'6 5':$('lineStyle').value==='dotted'?'1 4':'';
  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
  const grid=mode!=='safe'&&mode!=='ui'&&(! $('layerGrid')||$('layerGrid').checked),safe=mode!=='grid'&&mode!=='ui'&&$('safeToggle').checked&&(!$('layerSafe')||$('layerSafe').checked),ui=(mode==='ui'||(mode!=='grid'&&mode!=='safe'))&&$('platformUI')&&$('platformUI').checked&&(mode==='ui'||(!$('layerUI')||$('layerUI').checked));
  if(grid){
@@ -179,7 +179,7 @@ function svgMarkup(mode='both'){
    const def=BOOK_GRIDS[layout],usableW=Math.max(0,innerW-g*(def.cols-1)),usableH=Math.max(0,innerH-g*(def.rows-1)),cw=usableW/def.cols,ch=usableH/def.rows;
    for(let row=0;row<def.rows;row++)for(let col=0;col<def.cols;col++)s+=`<rect x="${m+col*(cw+g)}" y="${m+row*(ch+g)}" width="${cw}" height="${ch}"/>`;
   }else if(layout==='radial'){
-   const cx=W/2,cy=H/2;for(let i=1;i<=Math.min(cols,18);i++)s+=`<circle cx="${cx}" cy="${cy}" r="${Math.min(innerW,innerH)*i/(Math.min(cols,18)*2)}"/>`;for(let i=0;i<cols;i++){let a=Math.PI*2*i/cols;s+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*innerW}" y2="${cy+Math.sin(a)*innerH}"/>`}
+   const cx=W/2,cy=H/2,rx=innerW/2,ry=innerH/2,maxR=Math.min(rx,ry);for(let i=1;i<=Math.min(cols,18);i++)s+=`<ellipse cx="${cx}" cy="${cy}" rx="${rx*i/Math.min(cols,18)}" ry="${ry*i/Math.min(cols,18)}"/>`;for(let i=0;i<cols;i++){const a=Math.PI*2*i/cols;s+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*rx}" y2="${cy+Math.sin(a)*ry}"/>`}
   }else if(layout==='thirds'){
    for(let i=0;i<=3;i++){let x=m+innerW*i/3,y=m+innerH*i/3;s+=`<line x1="${x}" y1="${m}" x2="${x}" y2="${H-m}"/><line x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`}
   }else if(layout==='baseline'){
