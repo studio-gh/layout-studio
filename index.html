@@ -196,7 +196,10 @@ function svgMarkup(mode='both'){
  if(grid){
   s+=`<g fill="none" stroke="${color}" stroke-width="${sw}" opacity="${op}"${dash?` stroke-dasharray="${dash}"`:''}>`;
   const innerW=Math.max(0,W-2*m),innerH=Math.max(0,H-2*m);
-  if(layout==='columns'||layout==='asymmetric'||layout==='golden'||layout==='modular'){
+  if(layout==='modular'){
+   const cells=getColumnGeometry(W,m,g,cols,'columns'),moduleH=Math.max(0,innerH-g*(rows-1))/rows;
+   for(const cell of cells)for(let row=0;row<rows;row++)s+=`<rect x="${cell.x}" y="${m+row*(moduleH+g)}" width="${cell.width}" height="${moduleH}"/>`;
+  }else if(layout==='columns'||layout==='asymmetric'||layout==='golden'){
    const cells=getColumnGeometry(W,m,g,cols,layout);
    for(const cell of cells)s+=`<rect x="${cell.x}" y="${m}" width="${cell.width}" height="${innerH}"/>`
   }else if(layout==='diagonal'){
@@ -221,7 +224,7 @@ function svgMarkup(mode='both'){
   }else if(layout==='thirds'){
    for(let i=0;i<=3;i++){let x=m+innerW*i/3,y=m+innerH*i/3;s+=`<line x1="${x}" y1="${m}" x2="${x}" y2="${H-m}"/><line x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`}
   }else if(layout==='baseline'){
-   for(let y=m;y<=H-m;y+=Math.max(8,g*2))s+=`<line x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`
+   const baselineStep=innerH/Math.max(1,rows);for(let i=0;i<=rows;i++){const y=m+i*baselineStep;s+=`<line x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`}
   }
   if(layout==='columns'||layout==='asymmetric'||layout==='golden'){
    for(let i=0;i<=rows;i++){let y=m+(H-2*m)*i/rows;s+=`<line x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`}
