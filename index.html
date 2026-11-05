@@ -197,8 +197,8 @@ function svgMarkup(mode='both'){
   s+=`<g fill="none" stroke="${color}" stroke-width="${sw}" opacity="${op}"${dash?` stroke-dasharray="${dash}"`:''}>`;
   const innerW=Math.max(0,W-2*m),innerH=Math.max(0,H-2*m);
   if(layout==='modular'){
-   const cells=getColumnGeometry(W,m,g,cols,'columns'),moduleH=Math.max(0,innerH-g*(rows-1))/rows;
-   for(const cell of cells)for(let row=0;row<rows;row++)s+=`<rect x="${cell.x}" y="${m+row*(moduleH+g)}" width="${cell.width}" height="${moduleH}"/>`;
+   const gapX=Math.min(g,cols>1?innerW/(cols-1):0),gapY=Math.min(g,rows>1?innerH/(rows-1):0),cells=getColumnGeometry(W,m,gapX,cols,'columns'),moduleH=Math.max(0,innerH-gapY*(rows-1))/rows;
+   for(const cell of cells)for(let row=0;row<rows;row++)s+=`<rect x="${cell.x}" y="${m+row*(moduleH+gapY)}" width="${cell.width}" height="${moduleH}"/>`;
   }else if(layout==='columns'||layout==='asymmetric'||layout==='golden'){
    const cells=getColumnGeometry(W,m,g,cols,layout);
    for(const cell of cells)s+=`<rect x="${cell.x}" y="${m}" width="${cell.width}" height="${innerH}"/>`
@@ -217,8 +217,8 @@ function svgMarkup(mode='both'){
     if(points.length>=2){const a=points[0],b=points[1];s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`}
    }
   }else if(['muller8','muller20','muller32'].includes(layout)){
-   const def=BOOK_GRIDS[layout],usableW=Math.max(0,innerW-g*(def.cols-1)),usableH=Math.max(0,innerH-g*(def.rows-1)),cw=usableW/def.cols,ch=usableH/def.rows;
-   for(let row=0;row<def.rows;row++)for(let col=0;col<def.cols;col++)s+=`<rect x="${m+col*(cw+g)}" y="${m+row*(ch+g)}" width="${cw}" height="${ch}"/>`;
+   const def=BOOK_GRIDS[layout],gapX=Math.min(g,def.cols>1?innerW/(def.cols-1):0),gapY=Math.min(g,def.rows>1?innerH/(def.rows-1):0),usableW=Math.max(0,innerW-gapX*(def.cols-1)),usableH=Math.max(0,innerH-gapY*(def.rows-1)),cw=usableW/def.cols,ch=usableH/def.rows;
+   for(let row=0;row<def.rows;row++)for(let col=0;col<def.cols;col++)s+=`<rect x="${m+col*(cw+gapX)}" y="${m+row*(ch+gapY)}" width="${cw}" height="${ch}"/>`;
   }else if(layout==='radial'){
    const cx=W/2,cy=H/2,rx=innerW/2,ry=innerH/2,maxR=Math.min(rx,ry);for(let i=1;i<=Math.min(cols,18);i++)s+=`<ellipse cx="${cx}" cy="${cy}" rx="${rx*i/Math.min(cols,18)}" ry="${ry*i/Math.min(cols,18)}"/>`;for(let i=0;i<cols;i++){const a=Math.PI*2*i/cols;s+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*rx}" y2="${cy+Math.sin(a)*ry}"/>`}
   }else if(layout==='thirds'){
@@ -234,8 +234,8 @@ function svgMarkup(mode='both'){
   if($('showDimensions')&&$('showDimensions').checked){
    const f=Math.max(10,Math.min(W,H)*.016),c='#405fd2',fmt=v=>Math.round(v)+' px';
    let lines=[];
-   if(['muller8','muller20','muller32'].includes(layout)){const d=BOOK_GRIDS[layout],cw=(innerW-g*(d.cols-1))/d.cols,rh=(innerH-g*(d.rows-1))/d.rows;lines=[d.cols+' colunas · '+fmt(cw),d.rows+' linhas · '+fmt(rh),'Gutter: '+fmt(g)];}
-   else if(['columns','modular','asymmetric','golden'].includes(layout)){const cells=getColumnGeometry(W,m,g,cols,layout),widths=cells.map(c=>c.width),minW=Math.min(...widths),maxW=Math.max(...widths),rh=(innerH-g*(rows-1))/rows;lines=[cols+' colunas · '+(Math.round(minW)===Math.round(maxW)?fmt(minW):fmt(minW)+'–'+fmt(maxW)),rows+(layout==='modular'?' módulos':' divisões horizontais')+' · '+fmt(layout==='modular'?rh:innerH/rows),layout==='modular'?'Gutter H/V: '+fmt(g):'Gutter vertical: '+fmt(g)];}
+   if(['muller8','muller20','muller32'].includes(layout)){const d=BOOK_GRIDS[layout],gx=Math.min(g,d.cols>1?innerW/(d.cols-1):0),gy=Math.min(g,d.rows>1?innerH/(d.rows-1):0),cw=(innerW-gx*(d.cols-1))/d.cols,rh=(innerH-gy*(d.rows-1))/d.rows;lines=[d.cols+' colunas · '+fmt(cw),d.rows+' linhas · '+fmt(rh),'Gutter H/V: '+fmt(gx)+' / '+fmt(gy)];}
+   else if(['columns','modular','asymmetric','golden'].includes(layout)){const gapX=Math.min(g,cols>1?innerW/(cols-1):0),gapY=Math.min(g,rows>1?innerH/(rows-1):0),cells=getColumnGeometry(W,m,gapX,cols,layout),widths=cells.map(c=>c.width),minW=Math.min(...widths),maxW=Math.max(...widths),rh=(innerH-(layout==='modular'?gapY*(rows-1):0))/rows;lines=[cols+' colunas · '+(Math.round(minW)===Math.round(maxW)?fmt(minW):fmt(minW)+'–'+fmt(maxW)),rows+(layout==='modular'?' módulos':' divisões horizontais')+' · '+fmt(layout==='modular'?rh:innerH/rows),layout==='modular'?'Gutter H/V: '+fmt(gapX)+' / '+fmt(gapY):'Gutter vertical: '+fmt(gapX)];}
    else if(layout==='baseline'){lines=['Área útil: '+fmt(innerW)+' × '+fmt(innerH),'Intervalo baseline: '+fmt(innerH/Math.max(1,rows))];}
    else if(layout==='thirds'){lines=['Terços: '+fmt(innerW/3)+' × '+fmt(innerH/3)];}
    else if(layout==='diagonal'){lines=['Guias diagonais · '+cols+' divisões','Área útil: '+fmt(innerW)+' × '+fmt(innerH)];}
