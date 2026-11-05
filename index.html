@@ -197,17 +197,7 @@ function svgMarkup(mode='both'){
   }
  }
  if(safe){
-  const sp=$('safePreset').value;
-  let sx=n('safeX'),sy=n('safeY'),sb=n('safeBottom');
-  // Presets keep the protected area visibly inside the canvas. Vertical-video
-  // platforms reserve extra room for the floating action rail and caption UI.
-  if(sp==='platform'){sx=Math.max(6,sx);sy=Math.max(7,sy);sb=Math.max(12,sb)}
-  if(sp==='uniform'){sx=Math.max(6,sx);sy=Math.max(6,sy);sb=Math.max(6,sb)}
-  if(sp==='story'){sx=Math.max(12,sx);sy=Math.max(12,sy);sb=Math.max(24,sb)}
-  if(sp==='carousel'){sx=Math.max(6,sx);sy=Math.max(6,sy);sb=Math.max(8,sb)}
-  if(sp==='facebook'||sp==='linkedin'){sx=Math.max(6,sx);sy=Math.max(7,sy);sb=Math.max(10,sb)}
-  sx=Math.min(35,sx);sy=Math.min(35,sy);sb=Math.min(40,sb);
-  const x=Math.min(W*.45,W*sx/100),y=Math.min(H*.45,H*sy/100),b=Math.min(H*.45,H*sb/100),safeW=Math.max(0,W-2*x),bottom=Math.max(y,Math.min(H-b,H- Math.max(1,H*.01))),sh=Math.max(0,bottom-y);
+  const sm=safeMetrics(),x=sm.x,y=sm.y,safeW=sm.w,bottom=sm.bottom,sh=sm.h;
   if($('safeFill').checked)s+=`<rect x="${x}" y="${y}" width="${safeW}" height="${sh}" fill="#4b9b79" fill-opacity=".08"/>`;
   s+=`<rect x="${x}" y="${y}" width="${safeW}" height="${sh}" fill="none" stroke="#3b8c6b" stroke-width="${Math.max(1,sw)}" stroke-dasharray="7 5"/>`;
   s+=`<g fill="#3b8c6b" font-family="Arial,sans-serif" font-size="${Math.max(10,Math.min(W,H)*.018)}"><text x="${x+6}" y="${y+Math.max(14,Math.min(W,H)*.025)}">SAFE AREA</text></g>`;
