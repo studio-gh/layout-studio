@@ -196,9 +196,9 @@ function applyComposition(key){const c={editorial:['muller20',4,5,18,64],type:['
 function setPreset(key){if(!presets[key])return;let p=presets[key];['width','height','columns','rows','gutter','margin','safeX','safeY','safeBottom'].forEach((id,i)=>$(id).value=p[i]);$('platform').value=key;customSafe=false;$('safePreset').value=['ig-story','tiktok','youtube-shorts'].includes(key)?'story':key==='carousel'?'carousel':key==='facebook'?'facebook':key.startsWith('linkedin')?'linkedin':'platform';render()}
 function applyResponsiveGrid(){
  const device=$('responsiveDevice').value,W=Math.max(100,Math.min(8000,n('width'))),base={phone:{width:390,cols:4,margin:16,gutter:16},tablet:{width:768,cols:8,margin:32,gutter:24},desktop:{width:1440,cols:12,margin:'auto',gutter:24}}[device];
- const scale=W/base.width,margin=base.margin==='auto'?Math.max(0,(W-Math.min(W,n('responsiveMax')*scale))/2):base.margin*scale;
+ const maxContainer=Math.min(2400,Math.max(320,n('responsiveMax')||1200)),scale=W/base.width,margin=base.margin==='auto'?Math.max(0,(W-Math.min(W,maxContainer*scale))/2):base.margin*scale;
  layout='columns';$('columns').value=base.cols;$('margin').value=Number(margin.toFixed(2));$('gutter').value=Number((base.gutter*scale).toFixed(2));
- $('responsiveReadout').textContent=device==='desktop'?'Desktop: 12 colunas · margem automática '+Math.round(margin)+' px · gutter '+Math.round(base.gutter*scale)+' px · container máx. '+Math.round(Math.min(W,n('responsiveMax')*scale))+' px.':(device==='phone'?'Phone':'Tablet')+': '+base.cols+' colunas · margem '+Math.round(margin)+' px · gutter '+Math.round(base.gutter*scale)+' px. Escala '+scale.toFixed(3)+'× sobre a referência de '+base.width+' CSS px.';
+ $('responsiveReadout').textContent=device==='desktop'?'Desktop: 12 colunas · margem automática '+Math.round(margin)+' px · gutter '+Math.round(base.gutter*scale)+' px · container máx. '+Math.round(Math.min(W,maxContainer*scale))+' px.':(device==='phone'?'Phone':'Tablet')+': '+base.cols+' colunas · margem '+Math.round(margin)+' px · gutter '+Math.round(base.gutter*scale)+' px. Escala '+scale.toFixed(3)+'× sobre a referência de '+base.width+' CSS px.';
  render();toast('Grid responsivo aplicado');
 }
 function n(id){return Math.max(0,Number($(id).value)||0)}
